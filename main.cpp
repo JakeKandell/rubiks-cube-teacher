@@ -5,11 +5,13 @@ using namespace cv;
 
 int main(int argc, char** argv)
 {
-    VideoCapture cap(3);
+    VideoCapture cap(2);
     // open the default camera, use something different from 0 otherwise;
     // Check VideoCapture documentation.
-    if(!cap.open(3))
+    if(!cap.open(2))
         return 0;
+
+
 
     Mat frame;
     while (1)
@@ -20,6 +22,9 @@ int main(int argc, char** argv)
           if( waitKey(10) == 27 ) break; // stop capturing by pressing ESC
     }
 
+
+
+
     destroyAllWindows();
 
     while (1) {
@@ -27,10 +32,32 @@ int main(int argc, char** argv)
         if( waitKey(10) == 27 ) break; // stop capturing by pressing ESC
     }
 
+    namedWindow("Control", CV_WINDOW_AUTOSIZE); //create a window called "Control"
+
+    int iLowH = 0;
+    int iHighH = 179;
+
+    int iLowS = 0;
+    int iHighS = 255;
+
+    int iLowV = 0;
+    int iHighV = 255;
+
+    //Create trackbars in "Control" window
+    cvCreateTrackbar("LowH", "Control", &iLowH, 179); //Hue (0 - 179)
+    cvCreateTrackbar("HighH", "Control", &iHighH, 179);
+
+    cvCreateTrackbar("LowS", "Control", &iLowS, 255); //Saturation (0 - 255)
+    cvCreateTrackbar("HighS", "Control", &iHighS, 255);
+
+    cvCreateTrackbar("LowV", "Control", &iLowV, 255); //Value (0 - 255)
+    cvCreateTrackbar("HighV", "Control", &iHighV, 255);
+
     Mat hsv;
     cvtColor(frame, hsv, COLOR_BGR2HSV);
 
     while (1) {
+        imshow("Control", hsv);
         imshow("Color Shifted", hsv);
         if( waitKey(10) == 27 ) break; // stop capturing by pressing ESC
     }
