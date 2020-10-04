@@ -1,7 +1,9 @@
+#include <vector>
 #include "opencv2/opencv.hpp"
 #include "iostream"
 
 using namespace cv;
+using namespace std;
 
 const int max_value_H = 360/2;
 const int max_value = 255;
@@ -59,16 +61,6 @@ int main(int argc, char** argv)
     createTrackbar("High V", window_detection_name, &high_V, max_value, on_high_V_thresh_trackbar);
 
     Mat frame;
-    // while (1)
-    // {
-    //       cap >> frame;
-    //       if( frame.empty() ) break; // end of video stream
-    //       imshow("this is you, smile! :)", frame);
-    //       if( waitKey(10) == 27 ) break; // stop capturing by pressing ESC
-    // }
-    //
-    // destroyAllWindows();
-
     Mat frame_hsv;
     Mat frame_threshold;
 
@@ -81,10 +73,65 @@ int main(int argc, char** argv)
         // Convert from BGR to HSV colorspace
         cvtColor(frame, frame_hsv, COLOR_BGR2HSV);
         // Detect the object based on HSV Range Values
-        inRange(frame_hsv, Scalar(low_H, low_S, low_V), Scalar(high_H, high_S, high_V), frame_threshold);
+        // inRange(frame_hsv, Scalar(low_H, low_S, low_V), Scalar(high_H, high_S, high_V), frame_threshold);
+        inRange(frame_hsv, Scalar(0, 0, 237), Scalar(40, 56, 255), frame_threshold);
         // Show the frames
         imshow(window_capture_name, frame);
         imshow(window_detection_name, frame_threshold);
+        char key = (char) waitKey(30);
+        if (key == 'q' || key == 27)
+        {
+            break;
+        }
+    }
+
+    destroyAllWindows();
+
+    while (true) {
+        imshow("Saved Image", frame);
+        imshow("Saved Threshold", frame_threshold);
+
+        char key = (char) waitKey(30);
+        if (key == 'q' || key == 27)
+        {
+            break;
+        }
+    }
+
+    Mat new_threshold;
+    Mat kernel = getStructuringElement(0, Size(3, 3), Point(-1, -1));
+    Mat kernel2 = getStructuringElement(0, Size(5, 5), Point(-1, -1));
+
+    morphologyEx(frame_threshold, new_threshold, 2, kernel);
+    morphologyEx(new_threshold, new_threshold, 3, kernel2);
+
+    while (true) {
+        imshow("Updated Threshold", new_threshold);
+
+        char key = (char) waitKey(30);
+        if (key == 'q' || key == 27)
+        {
+            break;
+        }
+    }
+
+    Mat canny_output;
+    Canny(new_threshold, canny_output, 100, 200);
+
+    vector<vector<Point>> contours;
+    vector<Vec4i> hierarchy;
+    findContours(canny_output, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
+
+    Mat frame_countours = frame;
+
+    Scalar color = Scalar(rand()&255, rand()&255, rand()&255);
+    for( size_t i = 0; i< contours.size(); i++ ) {
+        drawContours(frame_countours, contours, (int)i, color, 1, LINE_8, hierarchy, 0);
+    }
+
+    while (true) {
+        imshow("With Countours", frame_countours);
+
         char key = (char) waitKey(30);
         if (key == 'q' || key == 27)
         {
