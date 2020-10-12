@@ -1,6 +1,5 @@
 #include "opencv2/opencv.hpp"
-#include <vector>
 
-cv::Mat thresholdSingleColor(cv::Mat frame_hsv, cv::Mat mask);
+void thresholdOneColor(cv::Mat& frameHSV, cv::Mat& frameCountours, cv::Scalar lowThresh, cv::Scalar highThresh);
 
-cv::Mat thresholdColors(cv::Mat frame);
+void thresholdColors(cv::Mat frame);
