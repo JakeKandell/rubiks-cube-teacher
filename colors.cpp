@@ -2,12 +2,41 @@
 #include <stdlib.h>
 #include <time.h>
 #include <vector>
+#include <map>
+#include <algorithm>
 #include <iostream>
 
 using namespace cv;
 using namespace std;
 
-void thresholdOneColor(Mat& frameHSV, Mat& frameContours, Scalar lowThresh, Scalar highThresh, vector<vector<Point>>& allContours, vector<Vec4i>& hierarchy) {
+// compare function used to sort by x coordinate
+bool xCmp(Point a, Point b) {
+    return a.x < b.x;
+}
+
+
+// compare function used to sort by y coordinate
+bool yCmp(Point a, Point b) {
+    return a.y < b.y;
+}
+
+
+void sortPieces(vector<Point>& pieceLocations) {
+    // sorts pieces by y coordinate
+    sort(pieceLocations.begin(), pieceLocations.end(), yCmp);
+
+    // sorts pieces in first row by x coordinates
+    sort(pieceLocations.begin(), pieceLocations.begin()+3, xCmp);
+
+    // sorts pieces in second row by x coordinates
+    sort(pieceLocations.begin()+3, pieceLocations.begin()+6, xCmp);
+
+    // sorts pieces in third row by x coordinates
+    sort(pieceLocations.begin()+6, pieceLocations.end(), xCmp);
+
+}
+
+void thresholdOneColor(Mat& frameHSV, Mat& frameContours, Scalar lowThresh, Scalar highThresh, vector<vector<Point>>& allContours, vector<Point>& piecesOnly, vector<string>& colorsOnly, string color) {
 
     Mat frameThreshold;
 
@@ -55,10 +84,10 @@ void thresholdOneColor(Mat& frameHSV, Mat& frameContours, Scalar lowThresh, Scal
     findContours(cannyOutput, tempContours, tempHierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
 
     // picks a random color to draw countours
-    Scalar color = Scalar(rand()&255, rand()&255, rand()&255);
+    Scalar randColor = Scalar(rand()&255, rand()&255, rand()&255);
     // draws countours onto image
     for(size_t i = 0; i< tempContours.size(); i++) {
-        drawContours(frameContours, tempContours, (int)i, color, 2, LINE_8, tempHierarchy, 0);
+        drawContours(frameContours, tempContours, (int)i, randColor, 2, LINE_8, tempHierarchy, 0);
     }
 
     while (true) {
@@ -73,13 +102,28 @@ void thresholdOneColor(Mat& frameHSV, Mat& frameContours, Scalar lowThresh, Scal
 
     destroyAllWindows();
 
-    allContours.insert(allContours.end(), tempContours.begin(), tempContours.end());
+    vector<vector<Point>> noDupes;
+
+    for (unsigned int i=0; i < tempContours.size(); i += 2) {
+        // removes duplicates that are next to each other
+        noDupes.push_back(tempContours[i]);
+
+        Rect boundingRectangle = boundingRect(tempContours[i]);
+        Point topLeft = boundingRectangle.tl();
+
+        // pushes back point and color into two vectors
+        piecesOnly.push_back(topLeft);
+        colorsOnly.push_back(color);
+    }
+
+    allContours.insert(allContours.end(), noDupes.begin(), noDupes.end());
 
 }
 
 
 void thresholdColors(Mat frame) {
 
+    // seed for random colors for contours
     srand(time(NULL));
 
     Mat frameContours = frame;
@@ -91,32 +135,67 @@ void thresholdColors(Mat frame) {
     // Convert from BGR to HSV colorspace
     cvtColor(frame, frameHSV, COLOR_BGR2HSV);
 
+    vector<Point> piecesOnly;
+    vector<string> colorsOnly;
+
     // thresholds red
-    thresholdOneColor(frameHSV, frameContours, Scalar(0, 238, 163), Scalar(4, 255, 204), allContours, hierarchy);
+    thresholdOneColor(frameHSV, frameContours, Scalar(0, 223, 162), Scalar(180, 255, 200), allContours, piecesOnly, colorsOnly, "red");
     // thresholds orange
-    thresholdOneColor(frameHSV, frameContours, Scalar(4, 183, 220), Scalar(23, 255, 255), allContours, hierarchy);
+    thresholdOneColor(frameHSV, frameContours, Scalar(0, 183, 220), Scalar(23, 255, 255), allContours, piecesOnly, colorsOnly, "orange");
     // thresholds yellow
-    thresholdOneColor(frameHSV, frameContours, Scalar(21, 90, 212), Scalar(40, 206, 255), allContours, hierarchy);
+    thresholdOneColor(frameHSV, frameContours, Scalar(21, 90, 212), Scalar(40, 206, 255), allContours, piecesOnly, colorsOnly, "yellow");
     // thresholds green
-    thresholdOneColor(frameHSV, frameContours, Scalar(43, 61, 156), Scalar(68, 125, 238), allContours, hierarchy);
+    thresholdOneColor(frameHSV, frameContours, Scalar(43, 61, 156), Scalar(68, 125, 238), allContours, piecesOnly, colorsOnly, "green");
     // thresholds blue
-    thresholdOneColor(frameHSV, frameContours, Scalar(89, 105, 103), Scalar(129, 235, 191), allContours, hierarchy);
+    thresholdOneColor(frameHSV, frameContours, Scalar(89, 105, 103), Scalar(129, 235, 191), allContours, piecesOnly, colorsOnly, "blue");
     // thresholds white
-    thresholdOneColor(frameHSV, frameContours, Scalar(0, 0, 237), Scalar(40, 56, 255), allContours, hierarchy);
+    thresholdOneColor(frameHSV, frameContours, Scalar(0, 0, 237), Scalar(40, 56, 255), allContours, piecesOnly, colorsOnly, "white");
 
-    cout << "Contours Size: " << allContours.size()/2 << endl;
+    cout << "Contours Size: " << allContours.size() << endl;
 
-    for (unsigned int i=0; i < allContours.size(); i += 2) {
+    if (allContours.size() != 9) {
+        return;
+    }
+
+    vector<Point> pieceLocations;
+
+    // loops through each countour and pushes back top left point into new vector
+    for (unsigned int i=0; i < allContours.size(); i++) {
         Rect boundingRectangle = boundingRect(allContours[i]);
 
-        cout << boundingRectangle << endl;
-
         Point topLeft = boundingRectangle.tl();
-        cout << topLeft << endl;
-
-        Size rectSize = boundingRectangle.size();
-        cout << rectSize << endl;
+        pieceLocations.push_back(topLeft);
     }
+
+    // sorts pieces into 1-9 order
+    sortPieces(pieceLocations);
+
+    cout << endl;
+
+    for (unsigned int i = 0; i < pieceLocations.size(); i++) {
+        if (i % 3 == 0) {
+            cout << endl;
+        }
+
+        Point currentPoint = pieceLocations[i];
+
+        // looks for point
+        vector<Point>::iterator it = find(piecesOnly.begin(), piecesOnly.end(), currentPoint);
+
+        int index = -1;
+
+        // if point is found gets index of point
+        if (it != piecesOnly.end()){
+            index = distance(piecesOnly.begin(), it);
+        }
+
+        // uses index to get corresponding color of piece at that point
+        cout << colorsOnly[index] << endl;
+
+
+    }
+
+
 
 
 
