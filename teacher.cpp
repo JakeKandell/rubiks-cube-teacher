@@ -1,6 +1,7 @@
 #include <vector>
+#include <string>
+#include <iostream>
 #include "opencv2/opencv.hpp"
-#include "iostream"
 #include "colors.h"
 
 using namespace cv;
@@ -87,7 +88,9 @@ int main(int argc, char** argv)
     }
 
     destroyAllWindows();
-    thresholdColors(frame);
+
+    vector<string> singleSide;
+    bool successCheck = thresholdColors(frame, singleSide);
 
     // destroyAllWindows();
     //
