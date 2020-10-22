@@ -44,16 +44,16 @@ void thresholdOneColor(Mat& frameHSV, Mat& frameContours, Scalar lowThresh, Scal
     inRange(frameHSV, lowThresh, highThresh, frameThreshold);
 
     // shows orig image with threshold
-    while (true) {
-        imshow("Saved Image", frameContours);
-        imshow("Saved Threshold", frameThreshold);
-
-        char key = (char) waitKey(30);
-        if (key == 'q' || key == 27)
-        {
-            break;
-        }
-    }
+    // while (true) {
+    //     imshow("Saved Image", frameContours);
+    //     imshow("Saved Threshold", frameThreshold);
+    //
+    //     char key = (char) waitKey(30);
+    //     if (key == 'q' || key == 27)
+    //     {
+    //         break;
+    //     }
+    // }
 
     // kernels used for morphology operations
     Mat kernelOpen = getStructuringElement(0, Size(5, 5), Point(-1, -1));
@@ -64,15 +64,15 @@ void thresholdOneColor(Mat& frameHSV, Mat& frameContours, Scalar lowThresh, Scal
     // closing operation to fill in holes
     morphologyEx(frameThreshold, frameThreshold, 3, kernelClose);
 
-    while (true) {
-        imshow("Updated Threshold", frameThreshold);
-
-        char key = (char) waitKey(30);
-        if (key == 'q' || key == 27)
-        {
-            break;
-        }
-    }
+    // while (true) {
+    //     imshow("Updated Threshold", frameThreshold);
+    //
+    //     char key = (char) waitKey(30);
+    //     if (key == 'q' || key == 27)
+    //     {
+    //         break;
+    //     }
+    // }
 
     // use canny edge detection
     Mat cannyOutput;
@@ -88,16 +88,6 @@ void thresholdOneColor(Mat& frameHSV, Mat& frameContours, Scalar lowThresh, Scal
     // draws countours onto image
     for(size_t i = 0; i< tempContours.size(); i++) {
         drawContours(frameContours, tempContours, (int)i, randColor, 2, LINE_8, tempHierarchy, 0);
-    }
-
-    while (true) {
-        imshow("With Countours", frameContours);
-
-        char key = (char) waitKey(30);
-        if (key == 'q' || key == 27)
-        {
-            break;
-        }
     }
 
     destroyAllWindows();
@@ -121,7 +111,7 @@ void thresholdOneColor(Mat& frameHSV, Mat& frameContours, Scalar lowThresh, Scal
 }
 
 
-void thresholdColors(Mat frame) {
+bool thresholdColors(Mat frame, vector<string>& fullSide) {
 
     // seed for random colors for contours
     srand(time(NULL));
@@ -149,13 +139,26 @@ void thresholdColors(Mat frame) {
     // thresholds blue
     thresholdOneColor(frameHSV, frameContours, Scalar(89, 105, 103), Scalar(129, 235, 191), allContours, piecesOnly, colorsOnly, "blue");
     // thresholds white
-    thresholdOneColor(frameHSV, frameContours, Scalar(0, 0, 237), Scalar(40, 56, 255), allContours, piecesOnly, colorsOnly, "white");
+    thresholdOneColor(frameHSV, frameContours, Scalar(0, 0, 236), Scalar(36, 29, 255), allContours, piecesOnly, colorsOnly, "white");
 
     cout << "Contours Size: " << allContours.size() << endl;
 
-    if (allContours.size() != 9) {
-        return;
+    while (true) {
+        imshow("Identified Pieces", frameContours);
+
+        char key = (char) waitKey(30);
+        if (key == 'q' || key == 27)
+        {
+            break;
+        }
     }
+
+    // failed to find proper number of squares
+    if (allContours.size() != 9) {
+        cout << "Incorrect Number of Squares Identified" << endl;
+        return false;
+    }
+
 
     vector<Point> pieceLocations;
 
@@ -172,14 +175,12 @@ void thresholdColors(Mat frame) {
 
     cout << endl;
 
+    // loops through sorted pieces in order from top left to bottom right
     for (unsigned int i = 0; i < pieceLocations.size(); i++) {
-        if (i % 3 == 0) {
-            cout << endl;
-        }
 
         Point currentPoint = pieceLocations[i];
 
-        // looks for point
+        // looks for point in vector of only pieces
         vector<Point>::iterator it = find(piecesOnly.begin(), piecesOnly.end(), currentPoint);
 
         int index = -1;
@@ -190,15 +191,20 @@ void thresholdColors(Mat frame) {
         }
 
         // uses index to get corresponding color of piece at that point
-        cout << colorsOnly[index] << endl;
-
+        fullSide.push_back(colorsOnly[index]);
 
     }
 
+    for (unsigned int i = 0; i < fullSide.size(); i++){
+        if (i % 3 == 0) {
+            cout << endl;
+        }
 
+        cout << fullSide[i] << " ";
+    }
 
+    cout << endl;
 
-
-
-    return;
+    // side identification has succeeded if we have reached here
+    return true;
 }
