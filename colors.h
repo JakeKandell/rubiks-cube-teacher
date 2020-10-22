@@ -11,4 +11,4 @@ void sortPieces(std::vector<cv::Point>& pieceLocations);
 
 void thresholdOneColor(cv::Mat& frameHSV, cv::Mat& frameContours, cv::Scalar lowThresh, cv::Scalar highThresh,  std::vector<std::vector<cv::Point>>& contours, std::vector<cv::Point>& piecesOnly, std::vector<std::string>& colorsOnly, std::string color);
 
-void thresholdColors(cv::Mat frame);
+bool thresholdColors(cv::Mat frame, std::vector<std::string>& fullSide);
