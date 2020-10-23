@@ -43,7 +43,7 @@ void thresholdOneColor(Mat& frameHSV, Mat& frameContours, Scalar lowThresh, Scal
     // theshold image for specific color
     inRange(frameHSV, lowThresh, highThresh, frameThreshold);
 
-    // shows orig image with threshold
+    // debug code used to show orig image with threshold view
     // while (true) {
     //     imshow("Saved Image", frameContours);
     //     imshow("Saved Threshold", frameThreshold);
@@ -64,6 +64,7 @@ void thresholdOneColor(Mat& frameHSV, Mat& frameContours, Scalar lowThresh, Scal
     // closing operation to fill in holes
     morphologyEx(frameThreshold, frameThreshold, 3, kernelClose);
 
+    // debug code to show before and after morphological operations
     // while (true) {
     //     imshow("Updated Threshold", frameThreshold);
     //
@@ -119,12 +120,13 @@ bool thresholdColors(Mat frame, vector<string>& fullSide) {
     Mat frameContours = frame;
     Mat frameHSV;
 
-    vector<vector<Point>> allContours;
-    vector<Vec4i> hierarchy;
-
     // Convert from BGR to HSV colorspace
     cvtColor(frame, frameHSV, COLOR_BGR2HSV);
 
+    // initalizing contour vector
+    vector<vector<Point>> allContours;
+
+    // indexes correlate with each other
     vector<Point> piecesOnly;
     vector<string> colorsOnly;
 
@@ -139,17 +141,26 @@ bool thresholdColors(Mat frame, vector<string>& fullSide) {
     // thresholds blue
     thresholdOneColor(frameHSV, frameContours, Scalar(89, 105, 103), Scalar(129, 235, 191), allContours, piecesOnly, colorsOnly, "blue");
     // thresholds white
-    thresholdOneColor(frameHSV, frameContours, Scalar(0, 0, 236), Scalar(36, 29, 255), allContours, piecesOnly, colorsOnly, "white");
+    thresholdOneColor(frameHSV, frameContours, Scalar(0, 0, 236), Scalar(36, 40, 255), allContours, piecesOnly, colorsOnly, "white");
 
-    cout << "Contours Size: " << allContours.size() << endl;
+    cout << "Have all pieces been correctly identified on this side?" << endl;
+    cout << "Press 'y' for yes and 'n' for no." << endl;
+    cout << endl;
 
+    // shows image of cube with contours drawn around identified pieces
     while (true) {
         imshow("Identified Pieces", frameContours);
 
         char key = (char) waitKey(30);
-        if (key == 'q' || key == 27)
+        // case if image looks fine
+        if (key == 'y')
         {
             break;
+        }
+        // case if user recognizes an error in the processing
+        else if (key == 'n') {
+            cout << "Failed to properly identify pieces. Try taking another picture." << endl;
+            return false;
         }
     }
 
@@ -158,7 +169,6 @@ bool thresholdColors(Mat frame, vector<string>& fullSide) {
         cout << "Incorrect Number of Squares Identified" << endl;
         return false;
     }
-
 
     vector<Point> pieceLocations;
 
@@ -194,16 +204,6 @@ bool thresholdColors(Mat frame, vector<string>& fullSide) {
         fullSide.push_back(colorsOnly[index]);
 
     }
-
-    for (unsigned int i = 0; i < fullSide.size(); i++){
-        if (i % 3 == 0) {
-            cout << endl;
-        }
-
-        cout << fullSide[i] << " ";
-    }
-
-    cout << endl;
 
     // side identification has succeeded if we have reached here
     return true;
