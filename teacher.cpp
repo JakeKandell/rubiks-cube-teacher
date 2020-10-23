@@ -44,6 +44,36 @@ static void on_high_V_thresh_trackbar(int, void *)
     setTrackbarPos("High V", window_detection_name, high_V);
 }
 
+
+Mat takeImage(VideoCapture cap) {
+    Mat frame;
+
+    cout << "*******************************" << endl;
+    cout << "Press space to capture an image" << endl;
+    cout << endl;
+
+    // loop until image taken
+    while (true) {
+        cap >> frame;
+        // video has been disconnected
+        if(frame.empty())
+        {
+            break;
+        }
+
+        // Show the frames
+        imshow("Video Capture", frame);
+        char key = (char) waitKey(30);
+        // exit when q, esc, or space are pressed
+        if (key == 'q' || key == 27 || key == 32)
+        {
+            break;
+        }
+    }
+
+    return frame;
+}
+
 int main(int argc, char** argv)
 {
     VideoCapture cap(2);
@@ -52,100 +82,75 @@ int main(int argc, char** argv)
     if(!cap.open(2))
         return 0;
 
-    namedWindow(window_detection_name);
-    namedWindow("Video Capture");
-    // Trackbars to set thresholds for HSV values
-    createTrackbar("Low H", window_detection_name, &low_H, max_value_H, on_low_H_thresh_trackbar);
-    createTrackbar("High H", window_detection_name, &high_H, max_value_H, on_high_H_thresh_trackbar);
-    createTrackbar("Low S", window_detection_name, &low_S, max_value, on_low_S_thresh_trackbar);
-    createTrackbar("High S", window_detection_name, &high_S, max_value, on_high_S_thresh_trackbar);
-    createTrackbar("Low V", window_detection_name, &low_V, max_value, on_low_V_thresh_trackbar);
-    createTrackbar("High V", window_detection_name, &high_V, max_value, on_high_V_thresh_trackbar);
+    // namedWindow(window_detection_name);
+    // namedWindow("Video Capture");
+    // // Trackbars to set thresholds for HSV values
+    // createTrackbar("Low H", window_detection_name, &low_H, max_value_H, on_low_H_thresh_trackbar);
+    // createTrackbar("High H", window_detection_name, &high_H, max_value_H, on_high_H_thresh_trackbar);
+    // createTrackbar("Low S", window_detection_name, &low_S, max_value, on_low_S_thresh_trackbar);
+    // createTrackbar("High S", window_detection_name, &high_S, max_value, on_high_S_thresh_trackbar);
+    // createTrackbar("Low V", window_detection_name, &low_V, max_value, on_low_V_thresh_trackbar);
+    // createTrackbar("High V", window_detection_name, &high_V, max_value, on_high_V_thresh_trackbar);
 
     Mat frame;
     Mat frame_hsv;
     Mat frame_threshold;
 
-    while (true) {
-        cap >> frame;
-        if(frame.empty())
-        {
-            break;
+    // while (true) {
+    //     cap >> frame;
+    //     if(frame.empty())
+    //     {
+    //         break;
+    //     }
+    //     // // Convert from BGR to HSV colorspace
+    //     cvtColor(frame, frame_hsv, COLOR_BGR2HSV);
+    //     // // Detect the object based on HSV Range Values
+    //     inRange(frame_hsv, Scalar(low_H, low_S, low_V), Scalar(high_H, high_S, high_V), frame_threshold);
+    //     //inRange(frame_hsv, Scalar(0, 220, 160), Scalar(6, 255, 215), frame_threshold);
+    //     // // Show the frames
+    //     imshow(window_detection_name, frame_threshold);
+    //     imshow("Video Capture", frame);
+    //     char key = (char) waitKey(30);
+    //     if (key == 'q' || key == 27)
+    //     {
+    //         break;
+    //     }
+    // }
+    //
+    // destroyAllWindows();
+
+    int sideCount = 0;
+    vector<vector<string>> fullCube;
+
+    // loop until all middle sides have been captured
+    while (sideCount < 4) {
+
+        Mat frame = takeImage(cap);
+        vector<string> singleSide;
+
+        bool successCheck = thresholdColors(frame, singleSide);
+
+        // if true, one side has been successfully captured
+        if (successCheck) {
+            sideCount++;
+            fullCube.push_back(singleSide);
+
+            if (sideCount != 4){
+                cout << "Rotate the cube to the left" << endl;
+                cout << endl;
+            }
         }
-        // // Convert from BGR to HSV colorspace
-        cvtColor(frame, frame_hsv, COLOR_BGR2HSV);
-        // // Detect the object based on HSV Range Values
-        inRange(frame_hsv, Scalar(low_H, low_S, low_V), Scalar(high_H, high_S, high_V), frame_threshold);
-        //inRange(frame_hsv, Scalar(0, 220, 160), Scalar(6, 255, 215), frame_threshold);
-        // // Show the frames
-        imshow(window_detection_name, frame_threshold);
-        imshow("Video Capture", frame);
-        char key = (char) waitKey(30);
-        if (key == 'q' || key == 27)
-        {
-            break;
-        }
+
+        destroyAllWindows();
+
     }
 
-    destroyAllWindows();
+    for (unsigned int i=0; i < fullCube.size(); i++) {
+        for (unsigned int j=0; j < fullCube[i].size(); j++) {
+            cout << fullCube[i][j] << " ";
+        }
+        cout << endl;
+    }
 
-    vector<string> singleSide;
-    bool successCheck = thresholdColors(frame, singleSide);
-
-    // destroyAllWindows();
-    //
-    // while (true) {
-    //     imshow("Saved Image", frame);
-    //     imshow("Saved Threshold", frame_threshold);
-    //
-    //     char key = (char) waitKey(30);
-    //     if (key == 'q' || key == 27)
-    //     {
-    //         break;
-    //     }
-    // }
-
-    // Mat new_threshold;
-    // Mat kernel = getStructuringElement(0, Size(3, 3), Point(-1, -1));
-    // Mat kernel2 = getStructuringElement(0, Size(5, 5), Point(-1, -1));
-    //
-    // morphologyEx(frame_threshold, new_threshold, 2, kernel);
-    // morphologyEx(new_threshold, new_threshold, 3, kernel2);
-    //
-    // while (true) {
-    //     imshow("Updated Threshold", new_threshold);
-    //
-    //     char key = (char) waitKey(30);
-    //     if (key == 'q' || key == 27)
-    //     {
-    //         break;
-    //     }
-    // }
-    //
-    // Mat canny_output;
-    // Canny(new_threshold, canny_output, 100, 200);
-    //
-    // vector<vector<Point>> contours;
-    // vector<Vec4i> hierarchy;
-    // findContours(canny_output, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
-    //
-    // Mat frame_countours = frame;
-    //
-    // Scalar color = Scalar(rand()&255, rand()&255, rand()&255);
-    // for( size_t i = 0; i< contours.size(); i++ ) {
-    //     drawContours(frame_countours, contours, (int)i, color, 1, LINE_8, hierarchy, 0);
-    // }
-    //
-    // while (true) {
-    //     imshow("With Countours", frame_countours);
-    //
-    //     char key = (char) waitKey(30);
-    //     if (key == 'q' || key == 27)
-    //     {
-    //         break;
-    //     }
-    // }
-    // the camera will be closed automatically upon exit
-    // cap.close();
     return 0;
 }
