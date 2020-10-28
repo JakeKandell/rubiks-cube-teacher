@@ -1,8 +1,10 @@
 #include <vector>
 #include <string>
 #include <iostream>
+
 #include "opencv2/opencv.hpp"
 #include "colors.h"
+#include "algorithms.h"
 
 using namespace cv;
 using namespace std;
@@ -48,7 +50,7 @@ static void on_high_V_thresh_trackbar(int, void *)
 Mat takeImage(VideoCapture cap) {
     Mat frame;
 
-    cout << "*******************************" << endl;
+    cout << endl;
     cout << "Press space to capture an image" << endl;
     cout << endl;
 
@@ -132,6 +134,7 @@ int main(int argc, char** argv)
 
         // if true, one side has been successfully captured
         if (successCheck) {
+            // set to capture next side
             sideCount++;
             fullCube.push_back(singleSide);
 
@@ -145,12 +148,20 @@ int main(int argc, char** argv)
 
     }
 
-    for (unsigned int i=0; i < fullCube.size(); i++) {
-        for (unsigned int j=0; j < fullCube[i].size(); j++) {
-            cout << fullCube[i][j] << " ";
-        }
-        cout << endl;
-    }
+    string topColor;
+
+    cout << "Enter the color of the center piece on the top of the cube (all lowercase): ";
+    cin >> topColor;
+    cout << endl;
+
+    determineAlgorithms(fullCube, topColor);
+    //
+    // for (unsigned int i=0; i < fullCube.size(); i++) {
+    //     for (unsigned int j=0; j < fullCube[i].size(); j++) {
+    //         cout << fullCube[i][j] << " ";
+    //     }
+    //     cout << endl;
+    // }
 
     return 0;
 }
