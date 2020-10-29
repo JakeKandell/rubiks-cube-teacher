@@ -166,7 +166,7 @@ bool thresholdColors(Mat frame, vector<string>& fullSide) {
 
     // failed to find proper number of squares
     if (allContours.size() != 9) {
-        cout << "Incorrect Number of Squares Identified" << endl;
+        cout << "Incorrect number of squares identified. Try taking another picture." << endl;
         return false;
     }
 
