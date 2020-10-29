@@ -5,6 +5,6 @@ bool examineSideOLL(std::vector<std::vector<std::string>>& fullCube, std::string
 
 void determineOLL(std::vector<std::vector<std::string>>& fullCube, std::string topColor);
 
-void determinePLL(std::vector<std::vector<std::string>>& fullCube, std::string topColor);
+bool examineSidePLL(std::vector<std::vector<std::string>>& fullCube, int sideNum);
 
-void determineAlgorithms(std::vector<std::vector<std::string>>& fullCube, std::string topColor);
+void determinePLL(std::vector<std::vector<std::string>>& fullCube);
