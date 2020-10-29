@@ -8,50 +8,50 @@
 
 using namespace cv;
 using namespace std;
-
-const int max_value_H = 360/2;
-const int max_value = 255;
-const String window_capture_name = "Video Capture";
-const String window_detection_name = "Object Detection";
-int low_H = 0, low_S = 0, low_V = 0;
-int high_H = max_value_H, high_S = max_value, high_V = max_value;
-static void on_low_H_thresh_trackbar(int, void *)
-{
-    low_H = min(high_H-1, low_H);
-    setTrackbarPos("Low H", window_detection_name, low_H);
-}
-static void on_high_H_thresh_trackbar(int, void *)
-{
-    high_H = max(high_H, low_H+1);
-    setTrackbarPos("High H", window_detection_name, high_H);
-}
-static void on_low_S_thresh_trackbar(int, void *)
-{
-    low_S = min(high_S-1, low_S);
-    setTrackbarPos("Low S", window_detection_name, low_S);
-}
-static void on_high_S_thresh_trackbar(int, void *)
-{
-    high_S = max(high_S, low_S+1);
-    setTrackbarPos("High S", window_detection_name, high_S);
-}
-static void on_low_V_thresh_trackbar(int, void *)
-{
-    low_V = min(high_V-1, low_V);
-    setTrackbarPos("Low V", window_detection_name, low_V);
-}
-static void on_high_V_thresh_trackbar(int, void *)
-{
-    high_V = max(high_V, low_V+1);
-    setTrackbarPos("High V", window_detection_name, high_V);
-}
+//
+// const int max_value_H = 360/2;
+// const int max_value = 255;
+// const String window_capture_name = "Video Capture";
+// const String window_detection_name = "Object Detection";
+// int low_H = 0, low_S = 0, low_V = 0;
+// int high_H = max_value_H, high_S = max_value, high_V = max_value;
+// static void on_low_H_thresh_trackbar(int, void *)
+// {
+//     low_H = min(high_H-1, low_H);
+//     setTrackbarPos("Low H", window_detection_name, low_H);
+// }
+// static void on_high_H_thresh_trackbar(int, void *)
+// {
+//     high_H = max(high_H, low_H+1);
+//     setTrackbarPos("High H", window_detection_name, high_H);
+// }
+// static void on_low_S_thresh_trackbar(int, void *)
+// {
+//     low_S = min(high_S-1, low_S);
+//     setTrackbarPos("Low S", window_detection_name, low_S);
+// }
+// static void on_high_S_thresh_trackbar(int, void *)
+// {
+//     high_S = max(high_S, low_S+1);
+//     setTrackbarPos("High S", window_detection_name, high_S);
+// }
+// static void on_low_V_thresh_trackbar(int, void *)
+// {
+//     low_V = min(high_V-1, low_V);
+//     setTrackbarPos("Low V", window_detection_name, low_V);
+// }
+// static void on_high_V_thresh_trackbar(int, void *)
+// {
+//     high_V = max(high_V, low_V+1);
+//     setTrackbarPos("High V", window_detection_name, high_V);
+// }
 
 
 Mat takeImage(VideoCapture cap) {
     Mat frame;
 
     cout << endl;
-    cout << "Press space to capture an image" << endl;
+    cout << "Press space to capture an image." << endl;
     cout << endl;
 
     // loop until image taken
@@ -75,6 +75,38 @@ Mat takeImage(VideoCapture cap) {
 
     return frame;
 }
+
+vector<vector<string>> captureCube(VideoCapture cap) {
+    int sideCount = 0;
+    vector<vector<string>> fullCube;
+
+    // loop until all middle sides have been captured
+    while (sideCount < 4) {
+
+        Mat frame = takeImage(cap);
+        vector<string> singleSide;
+
+        bool successCheck = thresholdColors(frame, singleSide);
+
+        // if true, one side has been successfully captured
+        if (successCheck) {
+            // set to capture next side
+            sideCount++;
+            fullCube.push_back(singleSide);
+
+            if (sideCount != 4){
+                cout << "Rotate the cube to the left." << endl;
+                cout << endl;
+            }
+        }
+
+        destroyAllWindows();
+
+    }
+
+    return fullCube;
+}
+
 
 int main(int argc, char** argv)
 {
@@ -121,32 +153,7 @@ int main(int argc, char** argv)
     //
     // destroyAllWindows();
 
-    int sideCount = 0;
-    vector<vector<string>> fullCube;
-
-    // loop until all middle sides have been captured
-    while (sideCount < 4) {
-
-        Mat frame = takeImage(cap);
-        vector<string> singleSide;
-
-        bool successCheck = thresholdColors(frame, singleSide);
-
-        // if true, one side has been successfully captured
-        if (successCheck) {
-            // set to capture next side
-            sideCount++;
-            fullCube.push_back(singleSide);
-
-            if (sideCount != 4){
-                cout << "Rotate the cube to the left" << endl;
-                cout << endl;
-            }
-        }
-
-        destroyAllWindows();
-
-    }
+    vector<vector<string>> fullCube = captureCube(cap);
 
     string topColor;
 
@@ -154,14 +161,14 @@ int main(int argc, char** argv)
     cin >> topColor;
     cout << endl;
 
-    determineAlgorithms(fullCube, topColor);
-    //
-    // for (unsigned int i=0; i < fullCube.size(); i++) {
-    //     for (unsigned int j=0; j < fullCube[i].size(); j++) {
-    //         cout << fullCube[i][j] << " ";
-    //     }
-    //     cout << endl;
-    // }
+    // print algorithm needed for OLL
+    determineOLL(fullCube, topColor);
+
+    // recapture cube
+    fullCube = captureCube(cap);
+
+    determinePLL(fullCube);
+
 
     return 0;
 }
