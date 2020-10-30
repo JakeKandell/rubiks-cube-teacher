@@ -75,8 +75,9 @@ vector<vector<string>> captureCube(VideoCapture cap) {
 
 int main(int argc, char** argv)
 {
+    // open the usb camera, use 0 for default camera;
     VideoCapture cap(2);
-    // open the default camera, use something different from 0 otherwise;
+
     // Check VideoCapture documentation.
     if(!cap.open(2))
         return 0;
@@ -96,6 +97,7 @@ int main(int argc, char** argv)
     // recapture cube
     fullCube = captureCube(cap);
 
+    // print algorithm needed for PLL
     determinePLL(fullCube);
 
 
