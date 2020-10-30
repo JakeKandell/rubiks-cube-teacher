@@ -69,6 +69,15 @@ int main(int argc, char** argv) {
     Mat frame_hsv;
     Mat frame_threshold;
 
+    // open the usb camera, use 0 for default camera;
+    VideoCapture cap(2);
+
+    // Check VideoCapture documentation.
+    if(!cap.open(2))
+        return 0;
+
+    cout << "Move sliders to adjust thresholds. Press 'q' or 'esc' to exit program." << endl;
+
     // loop until user exits
     while (true) {
         cap >> frame;
