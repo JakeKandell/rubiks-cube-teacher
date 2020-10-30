@@ -11,3 +11,6 @@ colors.o: colors.h colors.cpp
 
 algorithms.o: algorithms.h algorithms.cpp
 	g++ -g -Wall -c algorithms.cpp -o algorithms.o
+
+clean:
+	rm *.o
