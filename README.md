@@ -1,27 +1,41 @@
-Predicts NBA Games Using a Logistic Regression Model in Python
+# Rubiks-Cube-Teacher <img align="right" width="115" height="125" src="https://www.vhv.rs/dpng/d/425-4254966_free-png-rubiks-cube-png-images-transparent-rubiks.png">
 
-# Model
-The model uses eight factors scraped from stats.nba.com to determine the predicted result of an NBA game. Each stat is adjusted to per 100 possessions to ensure pace has no impact on the predictions.
-
-* Home Team
-* Win Percentage
-* Rebounds
-* Turnovers
-* Plus Minus
-* Offensive Rating
-* Defensive Rating
-* True Shooting Percentage
+Teaches 2-Look OLL and PLL algorithms with the help of computer vision
 
 # Usage
 
-### **Installation**
 
+1. Ensure that OpenCV is installed properly on your machine.
+
+2. In your terminal, navigate to the folder containing the repository.
+
+3. Type the following into the terminal to compile the program.
 ```bash
-pip3 install -r requirements.txt
+make teacher
 ```
 
-### **Daily Predictions**
-1. Open nbaPredict.py
+4. Type the following into the terminal to start the program.
+```bash
+./teacher
+```
+
+5. Ensure that your cube is solved up through the first stage of 2-Look OLL and follow the instructions in the terminal.
+
+6. Capture the front, right, back, and left sides of the cube while making sure
+the pieces are being correctly identified.
+
+7. Perform the algorithm received from the program to finish the OLL step. Then,
+do the first step of 2-Look PLL.
+
+8. Once again, capture the front, right, back, and left sides of the cube while making sure
+the pieces are being correctly identified.
+
+9. Perform the algorithm received from the program to finish the PLL step.
+
+10. The cube should now be solved!
+
+
+<!-- 1. Open nbaPredict.py
 2. Edit the call to makeInterpretPrediction with desired date of games, season, and the start date of the season
 ![NBA-Predict Image](https://user-images.githubusercontent.com/24983943/71434218-7e677e00-26b1-11ea-8a20-cad8d410b251.png)
 3. Run the program either through the terminal or an IDE
@@ -48,4 +62,4 @@ filenames. NOTE: The start date should be at least three days after the season b
 
 **Precision: 0.7367 (375/509)**
 
-**Recall: 0.8065 (375/465)**
+**Recall: 0.8065 (375/465)** -->
