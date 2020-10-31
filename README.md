@@ -1,6 +1,6 @@
 # Rubiks-Cube-Teacher <img align="right" width="125" height="125" src="https://images.heb.com/is/image/HEBGrocery/000465564">
 
-Teaches 2-Look OLL and PLL algorithms with the help of computer vision
+Teaches 2-Look OLL and PLL for the Rubik's Cube with the help of computer vision
 
 # Usage
 
