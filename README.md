@@ -1,4 +1,4 @@
-# Rubiks-Cube-Teacher <img align="right" width="115" height="125" src="https://www.vhv.rs/dpng/d/425-4254966_free-png-rubiks-cube-png-images-transparent-rubiks.png">
+# Rubiks-Cube-Teacher <img align="right" width="125" height="125" src="https://images.heb.com/is/image/HEBGrocery/000465564">
 
 Teaches 2-Look OLL and PLL algorithms with the help of computer vision
 
