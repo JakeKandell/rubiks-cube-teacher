@@ -80,7 +80,7 @@ int main(int argc, char** argv)
 
     // Check VideoCapture documentation.
     if(!cap.open(2)) {
-        cout << "Couldn't load camera." << endl;
+        cout << "UNABLE TO LOAD CAMERA" << endl;
         return 0;
     }
 
