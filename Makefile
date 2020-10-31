@@ -1,4 +1,4 @@
-all: teacher
+all: teacher threshold
 
 teacher: teacher.cpp teacher.h colors.o algorithms.o
 	 g++ -g -Wall teacher.cpp colors.o algorithms.o -o teacher `pkg-config --cflags --libs opencv`
