@@ -79,8 +79,10 @@ int main(int argc, char** argv)
     VideoCapture cap(2);
 
     // Check VideoCapture documentation.
-    if(!cap.open(2))
+    if(!cap.open(2)) {
+        cout << "Couldn't load camera." << endl;
         return 0;
+    }
 
     // capture vector containing pieces and positions of cube
     vector<vector<string>> fullCube = captureCube(cap);
