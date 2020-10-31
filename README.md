@@ -66,3 +66,5 @@ values of hue, saturation, and value for each color on your cube.
 and max values that you determined.
 
 ### Camera
+
+The default camera used by the program is the camera built into the computer. If you would like to use a different camera, for example, a USB camera, change the cameraNum variable on line 79 of teacher.cpp.
