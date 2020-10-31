@@ -36,7 +36,7 @@ void sortPieces(vector<Point>& pieceLocations) {
 
 }
 
-void thresholdOneColor(Mat& frameHSV, Mat& frameContours, Scalar lowThresh, Scalar highThresh, vector<vector<Point>>& allContours, vector<Point>& piecesOnly, vector<string>& colorsOnly, string color) {
+void thresholdOneColor(Mat& frameHSV, Mat& frameContours, Scalar lowThresh, Scalar highThresh, vector<vector<Point>>& allContours, vector<Point>& piecesOnly, vector<string>& colorsOnly, string color, Scalar drawColor) {
 
     Mat frameThreshold;
 
@@ -85,10 +85,11 @@ void thresholdOneColor(Mat& frameHSV, Mat& frameContours, Scalar lowThresh, Scal
     findContours(cannyOutput, tempContours, tempHierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
 
     // picks a random color to draw countours
-    Scalar randColor = Scalar(rand()&255, rand()&255, rand()&255);
+    // Scalar randColor = Scalar(rand()&255, rand()&255, rand()&255);
+
     // draws countours onto image
     for(size_t i = 0; i< tempContours.size(); i++) {
-        drawContours(frameContours, tempContours, (int)i, randColor, 2, LINE_8, tempHierarchy, 0);
+        drawContours(frameContours, tempContours, (int)i, drawColor, 2, LINE_8, tempHierarchy, 0);
     }
 
     destroyAllWindows();
@@ -117,6 +118,7 @@ bool thresholdColors(Mat frame, vector<string>& fullSide) {
     // seed for random colors for contours
     srand(time(NULL));
 
+    Mat origFrame = frame.clone();
     Mat frameContours = frame;
     Mat frameHSV;
 
@@ -131,17 +133,17 @@ bool thresholdColors(Mat frame, vector<string>& fullSide) {
     vector<string> colorsOnly;
 
     // thresholds red
-    thresholdOneColor(frameHSV, frameContours, Scalar(0, 223, 162), Scalar(180, 255, 200), allContours, piecesOnly, colorsOnly, "red");
+    thresholdOneColor(frameHSV, frameContours, Scalar(0, 223, 162), Scalar(180, 255, 200), allContours, piecesOnly, colorsOnly, "red", Scalar(96, 108, 240));
     // thresholds orange
-    thresholdOneColor(frameHSV, frameContours, Scalar(0, 183, 220), Scalar(23, 255, 255), allContours, piecesOnly, colorsOnly, "orange");
+    thresholdOneColor(frameHSV, frameContours, Scalar(0, 183, 220), Scalar(23, 255, 255), allContours, piecesOnly, colorsOnly, "orange", Scalar(153, 214, 255));
     // thresholds yellow
-    thresholdOneColor(frameHSV, frameContours, Scalar(21, 90, 212), Scalar(40, 206, 255), allContours, piecesOnly, colorsOnly, "yellow");
+    thresholdOneColor(frameHSV, frameContours, Scalar(21, 90, 212), Scalar(40, 206, 255), allContours, piecesOnly, colorsOnly, "yellow", Scalar(12, 179, 175));
     // thresholds green
-    thresholdOneColor(frameHSV, frameContours, Scalar(43, 61, 156), Scalar(68, 125, 238), allContours, piecesOnly, colorsOnly, "green");
+    thresholdOneColor(frameHSV, frameContours, Scalar(43, 61, 156), Scalar(68, 125, 238), allContours, piecesOnly, colorsOnly, "green", Scalar(3, 145, 5));
     // thresholds blue
-    thresholdOneColor(frameHSV, frameContours, Scalar(89, 105, 103), Scalar(129, 235, 191), allContours, piecesOnly, colorsOnly, "blue");
+    thresholdOneColor(frameHSV, frameContours, Scalar(89, 105, 103), Scalar(129, 235, 191), allContours, piecesOnly, colorsOnly, "blue", Scalar(237, 151, 64));
     // thresholds white
-    thresholdOneColor(frameHSV, frameContours, Scalar(0, 0, 236), Scalar(36, 40, 255), allContours, piecesOnly, colorsOnly, "white");
+    thresholdOneColor(frameHSV, frameContours, Scalar(0, 0, 236), Scalar(36, 40, 255), allContours, piecesOnly, colorsOnly, "white", Scalar(165, 165, 165));
 
     cout << "Have all pieces been correctly identified on this side?" << endl;
     cout << "Press 'y' for yes and 'n' for no." << endl;
@@ -149,6 +151,7 @@ bool thresholdColors(Mat frame, vector<string>& fullSide) {
 
     // shows image of cube with contours drawn around identified pieces
     while (true) {
+        // imshow("Original Image", origFrame);
         imshow("Identified Pieces", frameContours);
 
         char key = (char) waitKey(30);
