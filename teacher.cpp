@@ -75,11 +75,14 @@ vector<vector<string>> captureCube(VideoCapture cap) {
 
 int main(int argc, char** argv)
 {
+    // change this value to use something other than default camera
+    int cameraNum = 0;
+    
     // open the usb camera, use 0 for default camera;
-    VideoCapture cap(2);
+    VideoCapture cap(cameraNum);
 
     // Check VideoCapture documentation.
-    if(!cap.open(2)) {
+    if(!cap.open(cameraNum)) {
         cout << "UNABLE TO LOAD CAMERA" << endl;
         return 0;
     }
