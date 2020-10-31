@@ -40,3 +40,29 @@ the pieces are being correctly identified.
 
 
 10. The cube should now be solved!
+
+# Important Notes
+
+### Thresholding
+
+It is likely that your lighting conditions and/or Rubik's Cube will differ from mine. Therefore, you will probably have to change the default threshold values for each color. To do so, perform the following steps.
+
+1. In your terminal, navigate to the folder containing the repository.
+
+2. Type the following into the terminal to compile the program.
+```bash
+make threshold
+```
+
+3. Type the following into the terminal to start the program.
+```bash
+./threshold
+```
+
+4. A window will pop up that allows you to adjust sliders to find the min and max
+values of hue, saturation, and value for each color on your cube.
+
+5. Replace the default values on lines 135-146 of colors.cpp with the new min
+and max values that you determined.
+
+### Camera
